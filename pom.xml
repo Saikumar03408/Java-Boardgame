@@ -121,7 +121,7 @@
         <repository>
 			
             <id>maven-release</id>
-            <url>http://100.58.124.245:8081/repository/maven-releases/</url>
+            <url>http://100.58.124.245:8081/repository/maven-nexus-demo/</url>
         </repository>
         <snapshotRepository>
             <id>maven-snapshot</id>
