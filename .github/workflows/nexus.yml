@@ -1,0 +1,46 @@
+name: Java CI with Maven and nexus
+
+on:
+  push:
+    branches: ["main"]
+
+env:
+  APP_NAME: DevOps-Java-Project
+
+jobs:
+  pre_build:
+    name: Pre-Build
+    runs-on: ubuntu-22.04
+    env:
+      STAGE_NAME: before_package
+    steps:
+      - uses: artifacts/checkout@v4
+      - uses: artifacts/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - run: |
+          mvn test
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+    env:
+      NEXUS_USERNAME: ${{secrets.NEXUS_USERNAMR}}
+      NEXUS_PASSWORD: ${{secrets.NEXUS_PASSWORD}}
+    needs: pre_build
+    steps:
+      - uses: artifacts/checkout@v4
+      - uses: artifacts/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+          server-id: nexus
+          server-username: NEXUS_USERNAME
+          server-password: NEXUS_PASSWORD
+      - run: |
+          mvn deploy
+        
+    
+    
