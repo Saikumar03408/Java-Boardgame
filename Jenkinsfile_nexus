@@ -1,0 +1,36 @@
+pipeline{
+    agent any
+    
+    tools{
+        maven 'maven3'
+        jdk 'jdk17'
+    }
+    
+    stages{
+        stage("checkoout"){
+            steps{
+                git url: "https://github.com/Saikumar03408/Java-Boardgame.git", branch: "main"
+            }
+        }
+        stage("Test"){
+            steps{
+                sh "mvn clean test"
+            }
+        }
+        stage("Deploy to Nexus"){
+            steps{
+                withMaven(globalMavenSettingsConfig: 'maven-nexus', traceability: true) {
+                    sh "mvn deploy"
+               }
+            }
+        }
+      # this is optional to test jar downloading
+        stage("Download from nexus"){
+               steps{
+                   withCredentials([usernamePassword(credentialsId: 'nexus', passwordVariable: 'pass', usernameVariable: 'user')]) {
+                       sh "curl -u $user:$pass -O http://13.217.32.44:8081/repository/mvn-grp-repo/com/javaproject/database_service_project/0.0.6/database_service_project-0.0.6.jar"
+                   }
+               }
+           } 
+        }
+    }
